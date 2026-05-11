@@ -1,26 +1,173 @@
 <!doctype html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>ONE AI Chat</title>    
-    <!-- THIS IS THE START OF A COMMENT BLOCK, BLOCK TO BE DELETED: Google Fonts here, example:
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>ONE AI Chat</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    THIS IS THE END OF A COMMENT BLOCK, BLOCK TO BE DELETED -->
-  </head>
+    <script type="module" crossorigin src="https://1-ai.netlify.app/assets/index-D-7WUD7o.js"></script>
+    <link rel="stylesheet" crossorigin href="https://1-ai.netlify.app/assets/index-DCP-crJI.css">
+    <style>
+      /* ===== CRITICAL FIXES FOR BUTTONS ===== */
 
+      /* Ensure all interactive elements are clickable */
+      * {
+        pointer-events: auto !important;
+      }
+
+      /* Specific fixes for buttons, inputs, and links */
+      button,
+      input,
+      textarea,
+      a,
+      [role="button"],
+      .send-button,
+      .media-button,
+      .upload-button,
+      .chat-input,
+      .message-input {
+        pointer-events: auto !important;
+        position: relative !important;
+        z-index: 100 !important;
+        cursor: pointer !important;
+      }
+
+      /* Ensure the root app container is above any overlays */
+      #root,
+      #app,
+      .app-container,
+      .chat-container {
+        position: relative !important;
+        z-index: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      /* Remove any Manus-related overlays that might block clicks */
+      [id*="manus"],
+      [class*="manus"],
+      [data-manus],
+      [data-loc],
+      canvas[data-manus-selector-canvas] {
+        display: none !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
+
+      /* Ensure chat interface elements are fully interactive */
+      .chat-interface,
+      .input-area,
+      .message-composer,
+      .toolbar,
+      .action-bar {
+        pointer-events: auto !important;
+        z-index: 50 !important;
+      }
+
+      /* Fix for file upload input */
+      input[type="file"] {
+        opacity: 1 !important;
+        position: relative !important;
+        z-index: 100 !important;
+      }
+
+      /* Ensure forms submit properly */
+      form {
+        pointer-events: auto !important;
+      }
+
+      /* Remove any pointer-events: none from parents */
+      body > div,
+      main,
+      section,
+      article {
+        pointer-events: auto !important;
+      }
+    </style>
+  </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
-  </body>
 
+    <script>
+      // ===== MANUS RUNTIME DISABLE =====
+
+      // Disable Manus development mode
+      window.__MANUS_HOST_DEV__ = false;
+
+      // Remove Manus elements immediately
+      (function() {
+        const manusSelectors = [
+          '[id*="manus"]',
+          '[class*="manus"]',
+          '[data-manus]',
+          '[data-manus-selector-canvas]',
+          '[data-manus-selector-input]',
+          '[data-loc]',
+          'script[id="manus-runtime"]'
+        ];
+
+        manusSelectors.forEach(selector => {
+          document.querySelectorAll(selector).forEach(el => {
+            if (el.tagName === 'SCRIPT') {
+              el.remove();
+            } else {
+              el.removeAttribute('data-loc');
+              el.removeAttribute('data-manus');
+              el.style.display = 'none';
+              el.style.pointerEvents = 'none';
+            }
+          });
+        });
+
+        // Remove shadow DOM elements created by Manus
+        document.querySelectorAll('div').forEach(div => {
+          if (div.shadowRoot && div.getAttribute('data-manus-selector-canvas')) {
+            div.remove();
+          }
+        });
+      })();
+
+      // Monitor for dynamically added Manus elements
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1) { // Element node
+              if (node.id && node.id.includes('manus') ||
+                  node.getAttribute && (
+                    node.getAttribute('data-manus') ||
+                    node.getAttribute('data-manus-selector-canvas') ||
+                    node.getAttribute('data-loc')
+                  )) {
+                node.remove();
+              }
+            }
+          });
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      // Ensure all buttons work by re-enabling event propagation
+      document.addEventListener('DOMContentLoaded', function() {
+        // Force enable all buttons
+        document.querySelectorAll('button').forEach(function(btn) {
+          btn.style.pointerEvents = 'auto';
+          btn.style.cursor = 'pointer';
+          btn.disabled = false;
+        });
+
+        // Ensure file inputs work
+        document.querySelectorAll('input[type="file"]').forEach(function(input) {
+          input.style.display = 'block';
+          input.style.opacity = '1';
+          input.style.pointerEvents = 'auto';
+        });
+      });
+    </script>
+  </body>
 </html>
