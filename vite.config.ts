@@ -205,16 +205,6 @@ function vitePluginStorageProxy(): Plugin {
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
 
-
-function getGithubPagesBasePath() {
-  const githubRepo = process.env.GITHUB_REPOSITORY;
-  if (!githubRepo) return "/";
-
-  const repoName = githubRepo.split("/")[1] || "";
-  if (repoName.endsWith(".github.io")) return "/";
-
-  return `/${repoName}/`;
-}
 export default defineConfig({
   plugins,
   resolve: {
@@ -225,7 +215,6 @@ export default defineConfig({
     },
   },
   envDir: path.resolve(import.meta.dirname),
-  base: getGithubPagesBasePath(),
   root: path.resolve(import.meta.dirname, "client"),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
